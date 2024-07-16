@@ -55,3 +55,4 @@ df = dynamic_trading_strategy(df, forecasts)
 # Perform backtest
 backtest_results = backtest(df, forecasts, initial_balance)
 print(backtest_results)
+#v1.1
