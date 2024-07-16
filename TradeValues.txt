@@ -9,5 +9,6 @@ use_model_2=false
 use_model_3=false
 use_model_4=false
 use_model_5=false
-use_model_6=true
+use_model_6=false
+use_model_7=true
 balance=1000

@@ -24,6 +24,7 @@ use_model_3 = trade_values.getboolean('use_model_3', fallback=False)
 use_model_4 = trade_values.getboolean('use_model_4', fallback=False)
 use_model_5 = trade_values.getboolean('use_model_5', fallback=False)
 use_model_6 = trade_values.getboolean('use_model_6', fallback=False)
+use_model_7 = trade_values.getboolean('use_model_7', fallback=False)
 initial_balance = float(trade_values['balance'])
 
 # Binance API keys
@@ -72,6 +73,10 @@ elif use_model_6:
     from forecasting.perform_forecasts import perform_forecasts_model_6
     forecasts = perform_forecasts_model_6(df, forecast_steps)
     print(f"Model-6 Forecasts: {forecasts}")
+elif use_model_7:
+    from forecasting.perform_forecasts import perform_forecasts_model_7
+    forecasts = perform_forecasts_model_7(df, forecast_steps)
+    print(f"Model-7 Forecasts: {forecasts}")
 else:
     raise ValueError("No model selected in configuration.")
 

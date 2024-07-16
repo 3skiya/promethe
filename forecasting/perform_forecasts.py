@@ -96,3 +96,19 @@ def perform_forecasts_model_6(df, forecast_steps):
         predictions.append(prediction[0, 0])
     predictions = scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
     return predictions.flatten()
+
+def perform_forecasts_model_7(df, forecast_steps):
+    df['date'] = pd.to_datetime(df.index)
+    df.set_index('date', inplace=True)
+    df = df.asfreq('H')
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(df['close'].values.reshape(-1, 1))
+    generator = load_model('new_models/gan_generator.h5')
+    predictions = []
+    for _ in range(forecast_steps):
+        noise = np.random.normal(0, 1, (1, 100))
+        prediction = generator.predict(noise)
+        scaled_data = np.append(scaled_data, prediction, axis=0)
+        predictions.append(prediction[0, 0])
+    predictions = scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
+    return predictions.flatten()
