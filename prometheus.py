@@ -28,6 +28,7 @@ client = initialize_binance(api_key, api_secret)
 # Fetch data
 print(f"Using symbol: {symbol}")
 data = fetch_data(client, symbol, timeframe, start_date, end_date)
+
 df = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'])
 df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
 df.set_index('timestamp', inplace=True)
@@ -54,4 +55,3 @@ df = dynamic_trading_strategy(df, forecasts)
 # Perform backtest
 backtest_results = backtest(df, forecasts, initial_balance)
 print(backtest_results)
-# 19:34
