@@ -1,26 +1,24 @@
 import pandas as pd
-import numpy as np
-import configparser  # configparser modülünü içe aktardık
+import configparser
 from data_fetching import fetch_data, load_api_keys, load_trade_values, initialize_binance
-from trading_strategies.dynamic_trading_strategy import dynamic_trading_strategy
-from performance import calculate_mape, print_mape, plot_forecasts
 from forecasting.perform_forecasts import perform_forecasts_model_1, perform_forecasts_model_2
-from backtesting.backtesting import backtest
+from trading_strategies.dynamic_trading_strategy import dynamic_trading_strategy
+from performance import calculate_mape, print_mape, backtest
 
-# API ve konfigürasyon dosyalarını yükle
-api_key_path = 'api.txt'
-trade_values_path = 'TradeValues.txt'
+# Config dosyasını yükle
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+# Config'den değerleri al
+api_key_path = config['DEFAULT']['api_key_path']
+trade_values_path = config['DEFAULT']['trade_values_path']
 
 # API anahtarlarını yükle
 api_key, api_secret = load_api_keys(api_key_path)
-
-# Binance API'yi başlat
 client = initialize_binance(api_key, api_secret)
 
-# Trade değerlerini yükle
+# İşlem değerlerini yükle
 trade_values = load_trade_values(trade_values_path)
-
-# Konfigürasyon değerlerini al
 symbol = trade_values['symbol']
 timeframe = trade_values['timeframe']
 start_date = trade_values['start_date']
@@ -32,45 +30,37 @@ use_model_2 = trade_values['use_model_2'].lower() == 'true'
 
 print(f"Using symbol: {symbol}")
 
-# Verileri çek
-data = fetch_data(client, symbol.replace("/", ""), timeframe, start_date, end_date)
-print("Fetched data:", data)  # Veriyi ekrana yazdır
-
-# DataFrame'e dönüştür
+# Veriyi çek
+data = fetch_data(client, symbol, timeframe, start_date, end_date)
 df = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-
-# Zaman damgasını tarihe çevir
 df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
 df.set_index('timestamp', inplace=True)
 
-# Model tahminlerini gerçekleştir
+# Teknik göstergeler ekle
+df['rsi'] = df['close'].rolling(window=14).apply(lambda x: (x.diff().mean() / x.abs().mean()) * 100)
+
+# Model 1 veya Model 2'yi kullanarak tahmin yap
+forecasts = None
 if use_model_1:
     forecasts = perform_forecasts_model_1(df, forecast_steps)
-    model_used = "Model-1 (ARIMA, Prophet, LSTM)"
+    print(f"Model-1 Forecasts: {forecasts}")
 elif use_model_2:
     forecasts = perform_forecasts_model_2(df, forecast_steps)
-    model_used = "Model-2 (LSTM from GitHub)"
-else:
-    forecasts = None
+    print(f"Model-2 Forecasts: {forecasts}")
 
-print(f"{model_used} Forecasts:", forecasts)
-
+# Tahminlerin None olmadığından emin olun
 if forecasts is None:
     raise ValueError("Tahminler NoneType, lütfen tahmin fonksiyonlarını kontrol edin.")
 
-# Dinamik ticaret stratejisini uygula
+# Dinamik işlem stratejisini uygulayın
 df = dynamic_trading_strategy(df, forecasts)
 
-# Backtest'i başlat
+# Backtest
 backtest_results = backtest(df, forecasts, initial_balance)
 
-# Backtest sonuçlarını yazdır
-print("Backtest results:", backtest_results)
-
-# Sonuçları özetle
-plot_forecasts(df, forecasts, backtest_results)
-
-print(f"Kullanılan Model: {model_used}")
+# MAPE hesapla ve yazdır
+mapes = calculate_mape(df, forecasts, start_date, forecast_steps)
+print_mape(mapes)
 
 # Günlük sonuçları yazdır
 for i in range(len(df)):

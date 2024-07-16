@@ -1,0 +1,17 @@
+Crypto
+└── Prometheus
+    ├── data_fetching.py        # Binance API'sine bağlanma, veri çekme ve ilgili API anahtarlarını yükleme işlemlerini gerçekleştirir.
+    ├── trading_strategies.py   # Teknik göstergeler ekler ve dinamik ticaret stratejilerini uygular.
+    ├── backtesting.py          # Backtesting işlemlerini gerçekleştirir ve performans metriklerini hesaplar.
+    ├── live_simulation.py      # Canlı simülasyon işlemlerini gerçekleştirir.
+    ├── real_trading.py         # Gerçek alım satım işlemlerini gerçekleştirir.
+    ├── summary.py              # İşlem listesini ve özet metrikleri oluşturur.
+    ├── forecasting.py          # ARIMA, Prophet ve LSTM tahmin fonksiyonlarını içerir.
+    ├── performance.py          # Performans metriklerini hesaplama ve grafik çizme fonksiyonlarını içerir.
+    ├── arima_model.py          # ARIMA modelini içerir ve ARIMA tahminlerini gerçekleştirir.
+    ├── prophet_model.py        # Prophet modelini içerir ve Prophet tahminlerini gerçekleştirir.
+    ├── lstm_model.py           # LSTM modelini içerir ve LSTM tahminlerini gerçekleştirir.
+    ├── prometheus.py           # Ana dosya. Diğer dosyalardaki fonksiyonları çağırarak veriyi çeker, tahminleri gerçekleştirir, ticaret stratejilerini uygular ve sonuçları özetler.
+    ├── api.txt                 # Binance API anahtarlarını içerir.
+    ├── TradeValues.txt         # Ticaret değerlerini içerir (örneğin, parite, zaman dilimi, bakiye, bütçe, kaldıraç, hedge, başlangıç ve bitiş tarihleri).
+    └── ModelValues.txt         # Model değerlerini içerir (örneğin, veri dosyasının yolu).
