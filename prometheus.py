@@ -58,4 +58,15 @@ df = dynamic_trading_strategy(df, forecasts)
 # Perform backtest
 backtest_results = backtest(df, forecasts, initial_balance)
 print(backtest_results)
-#v.1.5
+
+# Summary of forecasts and backtest results
+print("\nForecast Summary:")
+for i, forecast in enumerate(forecasts):
+    forecast_date = df.index[-forecast_steps + i]
+    print(f"Date: {forecast_date}, Forecast: {forecast[0]}")
+
+print("\nBacktest Summary:")
+print(f"Initial Balance: {backtest_results['initial_balance']}")
+print(f"Profit: {backtest_results['profit']}")
+print(f"Number of Trades: {backtest_results['trades']}")
+#v.1.6.
