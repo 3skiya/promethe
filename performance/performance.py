@@ -1,5 +1,4 @@
 import numpy as np
-
 def calculate_mape(y_true, y_pred):
     """
     Calculate the Mean Absolute Percentage Error (MAPE)
@@ -17,12 +16,14 @@ def print_mape(mape):
     """
     print(f"MAPE: {mape:.2f}%")
 
-def backtest(strategy, data):
+def backtest(data, forecasts, initial_balance):
     """
     Backtest a given strategy
-    :param strategy: trading strategy to backtest
     :param data: historical data for backtesting
+    :param forecasts: forecasts for the backtest period
+    :param initial_balance: starting balance for the backtest
     :return: backtesting results
     """
     # Placeholder implementation, replace with actual backtesting logic
-    return {"profit": 0, "trades": 0}
+    return {"profit": 0, "trades": 0, "initial_balance": initial_balance}
+#v1.1
