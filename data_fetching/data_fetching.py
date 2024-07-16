@@ -1,5 +1,6 @@
 from binance.client import Client
 import pandas as pd
+import configparser
 
 def load_api_keys(file_path):
     with open(file_path, 'r') as file:
