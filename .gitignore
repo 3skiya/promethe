@@ -3,3 +3,4 @@ venv/
 *.so
 api.txt
 config.json
+__pycache__/
