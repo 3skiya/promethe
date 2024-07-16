@@ -34,6 +34,9 @@ df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
 df.set_index('timestamp', inplace=True)
 df = df[['open', 'high', 'low', 'close', 'volume']]
 
+# Convert columns to numeric values
+df[['open', 'high', 'low', 'close', 'volume']] = df[['open', 'high', 'low', 'close', 'volume']].apply(pd.to_numeric)
+
 # Perform forecasts
 if use_model_1:
     from forecasting.perform_forecasts import perform_forecasts_model_1
@@ -55,3 +58,4 @@ df = dynamic_trading_strategy(df, forecasts)
 # Perform backtest
 backtest_results = backtest(df, forecasts, initial_balance)
 print(backtest_results)
+#v.1.4
