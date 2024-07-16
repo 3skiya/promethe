@@ -18,6 +18,8 @@ end_date = trade_values['end_date']
 forecast_steps = int(trade_values['forecast_steps'])
 use_model_1 = trade_values['use_model_1'].lower() == 'true'
 use_model_2 = trade_values['use_model_2'].lower() == 'true'
+use_model_3 = trade_values.getboolean('use_model_3', fallback=False)
+use_model_4 = trade_values.getboolean('use_model_4', fallback=False)
 initial_balance = float(trade_values['balance'])
 
 # Binance API keys
@@ -46,6 +48,14 @@ elif use_model_2:
     from new_models.model import perform_forecasts_model_2
     forecasts = perform_forecasts_model_2(df, forecast_steps)
     print(f"Model-2 Forecasts: {forecasts}")
+elif use_model_3:
+    from new_models.cnn_model import perform_forecasts_model_3
+    forecasts = perform_forecasts_model_3(df, forecast_steps)
+    print(f"Model-3 Forecasts: {forecasts}")
+elif use_model_4:
+    from new_models.gru_model import perform_forecasts_model_4
+    forecasts = perform_forecasts_model_4(df, forecast_steps)
+    print(f"Model-4 Forecasts: {forecasts}")
 else:
     raise ValueError("No model selected in configuration.")
 
@@ -69,4 +79,4 @@ print("\nBacktest Summary:")
 print(f"Initial Balance: {backtest_results['initial_balance']}")
 print(f"Profit: {backtest_results['profit']}")
 print(f"Number of Trades: {backtest_results['trades']}")
-#v.1.6.
+#v.1.7
