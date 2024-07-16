@@ -1,3 +1,9 @@
+
+### 3. Fonksiyonel Dizin-Dosya Yapısı
+
+Aşağıda belirtilen yapıyı oluşturabilirsiniz:
+
+```plaintext
 Crypto
 └── Prometheus
     ├── data_fetching.py        # Binance API'sine bağlanma, veri çekme ve ilgili API anahtarlarını yükleme işlemlerini gerçekleştirir.
