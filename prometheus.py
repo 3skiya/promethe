@@ -68,6 +68,26 @@ else:
 if forecasts is None:
     raise ValueError("Tahminler NoneType, lütfen tahmin fonksiyonlarını kontrol edin.")
 
+# Gerçek fiyatları Binance API'den çekme
+forecast_dates = pd.date_range(start=df.index[-forecast_steps], periods=forecast_steps, freq='H')
+actual_prices = []
+
+for date in forecast_dates:
+    klines = client.get_historical_klines(symbol, timeframe, str(date), str(date + pd.Timedelta(hours=1)))
+    if klines:
+        actual_prices.append(float(klines[0][4]))  # 'close' fiyatını al
+
+# Tahmin ve gerçekleşen fiyatları karşılaştırma
+forecast_df = pd.DataFrame({
+    'Date': forecast_dates,
+    'Forecast': forecasts,
+    'Actual': actual_prices
+})
+
+# Fark ve yüzde fark hesaplama
+forecast_df['Difference'] = forecast_df['Actual'] - forecast_df['Forecast']
+forecast_df['Percentage Difference (%)'] = (forecast_df['Difference'] / forecast_df['Actual']) * 100
+
 # Apply trading strategy
 df = dynamic_trading_strategy(df, forecasts)
 
@@ -77,11 +97,10 @@ print(backtest_results)
 
 # Summary of forecasts and backtest results
 print("\nForecast Summary:")
-for i, forecast in enumerate(forecasts):
-    forecast_date = df.index[-forecast_steps + i]
-    print(f"Date: {forecast_date}, Forecast: {forecast}")
+for i, row in forecast_df.iterrows():
+    print(f"Date: {row['Date']}, Forecast: {int(row['Forecast']):,}, Actual: {int(row['Actual']):,}, Difference: {int(row['Difference']):,}, Percentage Difference (%): {row['Percentage Difference (%)']:.2f}%")
 
 print("\nBacktest Summary:")
-print(f"Initial Balance: {backtest_results['initial_balance']}")
-print(f"Profit: {backtest_results['profit']}")
+print(f"Initial Balance: {int(backtest_results['initial_balance']):,}")
+print(f"Profit: {int(backtest_results['profit']):,}")
 print(f"Number of Trades: {backtest_results['trades']}")
