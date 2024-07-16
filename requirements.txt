@@ -8,3 +8,4 @@ keras==2.13.1
 ccxt
 pandas_ta
 scikit-learn
+configparser
