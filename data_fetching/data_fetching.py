@@ -29,15 +29,12 @@ def fetch_data(client, symbol, timeframe, start_date, end_date):
         ])
     return data
 
-def load_trade_values(file_path):
+def load_trade_values(trade_values_path):
     config = configparser.ConfigParser()
-    with open(file_path, 'r') as f:
-        config.read_file(f)
-    if not config.sections() and 'DEFAULT' not in config:
-        raise ValueError(f"Config file {file_path} is empty or not formatted correctly.")
-    trade_values = {}
-    for key in config['DEFAULT']:
-        trade_values[key] = config['DEFAULT'][key]
+    config.read(trade_values_path)
+    # Burada trade_values yüklemek için gerekli kodlar...
+    # Örneğin:
+    trade_values = config['DEFAULT']['trade_values']
     return trade_values
 
 def initialize_binance(api_key, api_secret):

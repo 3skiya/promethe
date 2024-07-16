@@ -1,21 +1,35 @@
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-from keras.models import load_model
 import pandas as pd
+import numpy as np
+from statsmodels.tsa.arima.model import ARIMA
+from tensorflow.keras.models import load_model
+from sklearn.preprocessing import MinMaxScaler
 
 def perform_forecasts_model_1(df, forecast_steps):
-    model = load_model('models/lstm_model.h5')
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(df['close'].values.reshape(-1, 1))
-    x_test = []
-    for i in range(forecast_steps, len(scaled_data)):
-        x_test.append(scaled_data[i-forecast_steps:i, 0])
-    x_test = np.array(x_test)
-    x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
-    predictions = model.predict(x_test)
-    predictions = scaler.inverse_transform(predictions)
-    return predictions[-forecast_steps:].tolist()
+    df['date'] = pd.to_datetime(df['timestamp'], unit='ms')
+    df.set_index('date', inplace=True)
+    df = df.asfreq('H')
+
+    model = ARIMA(df['close'], order=(5, 1, 0))
+    model_fit = model.fit()
+    forecast = model_fit.forecast(steps=forecast_steps)
+    return forecast
 
 def perform_forecasts_model_2(df, forecast_steps):
-    # Model-2'nin tahmin fonksiyonlarını buraya ekleyin
-    pass
+    df['date'] = pd.to_datetime(df['timestamp'], unit='ms')
+    df.set_index('date', inplace=True)
+    df = df.asfreq('H')
+
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(df['close'].values.reshape(-1, 1))
+
+    model = load_model('new_models/lstm_model.h5')
+    predictions = []
+
+    for i in range(forecast_steps):
+        last_data = scaled_data[-60:]
+        prediction = model.predict(last_data.reshape(1, 60, 1))
+        scaled_data = np.append(scaled_data, prediction, axis=0)
+        predictions.append(prediction[0, 0])
+
+    predictions = scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
+    return predictions.flatten()

@@ -1,17 +1,10 @@
 import numpy as np
 
-def calculate_mape(df, forecasts, start_date, steps):
-    actual = df.loc[start_date:].iloc[:steps]['close']
-    mape_arima = np.mean(np.abs((actual - forecasts['arima']) / actual)) * 100
-    mape_prophet = np.mean(np.abs((actual - forecasts['prophet']) / actual)) * 100
-    mape_lstm = np.mean(np.abs((actual - forecasts['lstm']) / actual)) * 100
-    return {
-        'arima': mape_arima,
-        'prophet': mape_prophet,
-        'lstm': mape_lstm
-    }
+def calculate_mape(actual, forecast):
+    actual, forecast = np.array(actual), np.array(forecast)
+    if len(actual) == 0:
+        raise ValueError("No actual values found for the specified start_date and steps.")
+    return np.mean(np.abs((actual - forecast) / actual)) * 100
 
-def print_mape(mapes):
-    print(f"ARIMA MAPE: {mapes['arima']:.2f}%")
-    print(f"Prophet MAPE: {mapes['prophet']:.2f}%")
-    print(f"LSTM MAPE: {mapes['lstm']:.2f}%")
+def print_mape(mape):
+    print(f'Mean Absolute Percentage Error (MAPE): {mape:.2f}%')
