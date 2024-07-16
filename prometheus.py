@@ -2,7 +2,7 @@ import configparser
 import pandas as pd
 import tensorflow as tf
 from binance.client import Client
-from data_fetching import fetch_data, load_api_keys, load_trade_values, initialize_binance
+from data_fetching.data_fetching import fetch_data, load_api_keys, load_trade_values, initialize_binance
 from trading_strategies.dynamic_trading_strategy import dynamic_trading_strategy
 from performance import calculate_mape, print_mape, backtest
 
@@ -55,4 +55,3 @@ df = dynamic_trading_strategy(df, forecasts)
 # Perform backtest
 backtest_results = backtest(df, forecasts, initial_balance)
 print(backtest_results)
-#v1.1
