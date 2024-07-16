@@ -8,16 +8,18 @@ from performance import calculate_mape, print_mape, backtest
 
 # Load configuration
 config_path = 'TradeValues.txt'
-trade_values = load_trade_values(config_path)
+config = configparser.ConfigParser()
+config.read(config_path)
 
 # Extract values from configuration
+trade_values = config['DEFAULT']
 symbol = trade_values['symbol'].replace("/", "")
 timeframe = trade_values['timeframe']
 start_date = trade_values['start_date']
 end_date = trade_values['end_date']
 forecast_steps = int(trade_values['forecast_steps'])
-use_model_1 = trade_values['use_model_1'].lower() == 'true'
-use_model_2 = trade_values['use_model_2'].lower() == 'true'
+use_model_1 = trade_values.getboolean('use_model_1', fallback=False)
+use_model_2 = trade_values.getboolean('use_model_2', fallback=False)
 use_model_3 = trade_values.getboolean('use_model_3', fallback=False)
 use_model_4 = trade_values.getboolean('use_model_4', fallback=False)
 initial_balance = float(trade_values['balance'])
@@ -31,7 +33,12 @@ client = initialize_binance(api_key, api_secret)
 print(f"Using symbol: {symbol}")
 data = fetch_data(client, symbol, timeframe, start_date, end_date)
 
-df = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'])
+# Check the structure of fetched data
+print(f"Fetched data: {data[:5]}")
+
+# Ensure the 'timestamp' column exists
+columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore']
+df = pd.DataFrame(data, columns=columns)
 df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
 df.set_index('timestamp', inplace=True)
 df = df[['open', 'high', 'low', 'close', 'volume']]
@@ -79,4 +86,3 @@ print("\nBacktest Summary:")
 print(f"Initial Balance: {backtest_results['initial_balance']}")
 print(f"Profit: {backtest_results['profit']}")
 print(f"Number of Trades: {backtest_results['trades']}")
-#v.1.7
