@@ -94,4 +94,5 @@ def perform_forecasts_model_6(df, forecast_steps):
         prediction = model.predict(last_data[-1].reshape(-1, 1))
         scaled_data = np.append(scaled_data, prediction, axis=0)
         predictions.append(prediction[0, 0])
-    predictions = scaler.inverse_transform(np.array(predic
+    predictions = scaler.inverse_transform(np.array(predictions).reshape(-1, 1))
+    return predictions.flatten()
