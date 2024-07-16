@@ -52,14 +52,4 @@ model.compile(optimizer='adam', loss='mean_squared_error')
 X_train, y_train = [], []
 for i in range(60, len(scaled_data)):
     X_train.append(scaled_data[i-60:i, 0])
-    y_train.append(scaled_data[i, 0])
-
-X_train, y_train = np.array(X_train), np.array(y_train)
-X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-
-# Model eğitimi
-model.fit(X_train, y_train, epochs=20, batch_size=32)
-
-# Modeli kaydetme
-os.makedirs('new_models', exist_ok=True)
-model.save('new_models/gru_model.h5')
+    y_train
