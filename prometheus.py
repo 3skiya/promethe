@@ -79,10 +79,10 @@ print(backtest_results)
 print("\nForecast Summary:")
 for i, forecast in enumerate(forecasts):
     forecast_date = df.index[-forecast_steps + i]
-    print(f"Date: {forecast_date}, Forecast: {forecast[0]}")
+    print(f"Date: {forecast_date}, Forecast: {forecast}")
 
 print("\nBacktest Summary:")
 print(f"Initial Balance: {backtest_results['initial_balance']}")
 print(f"Profit: {backtest_results['profit']}")
 print(f"Number of Trades: {backtest_results['trades']}")
-#v.1.10
+#v.1.11
