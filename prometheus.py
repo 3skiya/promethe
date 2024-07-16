@@ -85,4 +85,3 @@ print("\nBacktest Summary:")
 print(f"Initial Balance: {backtest_results['initial_balance']}")
 print(f"Profit: {backtest_results['profit']}")
 print(f"Number of Trades: {backtest_results['trades']}")
-#v.1.11

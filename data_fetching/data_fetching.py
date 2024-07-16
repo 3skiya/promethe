@@ -3,10 +3,10 @@ import pandas as pd
 import configparser
 
 def load_api_keys(file_path):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-        api_key = lines[0].strip().split('=')[1]
-        api_secret = lines[1].strip().split('=')[1]
+    config = configparser.ConfigParser()
+    config.read(file_path)
+    api_key = config['DEFAULT']['api_key']
+    api_secret = config['DEFAULT']['api_secret']
     return api_key, api_secret
 
 def fetch_data(client, symbol, timeframe, start_date, end_date):
