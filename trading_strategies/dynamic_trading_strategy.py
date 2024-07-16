@@ -1,20 +1,27 @@
-import pandas as pd
 import numpy as np
-
-def dynamic_trading_strategy(df, forecasts):
-    df['rsi'] = calculate_rsi(df['close'])
-    df['signal'] = 'hold'
-    for i in range(len(df) - len(forecasts), len(df)):
-        rsi = df.loc[i, 'rsi']
-        if rsi < 30 and forecasts[i - (len(df) - len(forecasts))] > df.loc[i, 'close']:
-            df.loc[i, 'signal'] = 'buy'
-        elif rsi > 70 and forecasts[i - (len(df) - len(forecasts))] < df.loc[i, 'close']:
-            df.loc[i, 'signal'] = 'sell'
-    return df
+import pandas as pd
 
 def calculate_rsi(series, period=14):
     delta = series.diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
-    rs = gain / loss
-    return 100 - 100 / (1 + rs)
+    gain = delta.where(delta > 0, 0)
+    loss = -delta.where(delta < 0, 0)
+    avg_gain = gain.rolling(window=period, min_periods=1).mean()
+    avg_loss = loss.rolling(window=period, min_periods=1).mean()
+    rs = avg_gain / avg_loss
+    rsi = 100 - (100 / (1 + rs))
+    return rsi
+
+def dynamic_trading_strategy(df, forecasts):
+    df['rsi'] = calculate_rsi(df['close'])
+    
+    for i in range(1, len(df)):
+        rsi = df.iloc[i]['rsi']
+        if rsi < 30:
+            df.loc[df.index[i], 'signal'] = 'buy'
+        elif rsi > 70:
+            df.loc[df.index[i], 'signal'] = 'sell'
+        else:
+            df.loc[df.index[i], 'signal'] = 'hold'
+    
+    return df
+#v.1.1
