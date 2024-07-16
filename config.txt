@@ -1,0 +1,4 @@
+use_rsi=True
+use_macd=True
+use_stochastic=True
+use_bollinger_bands=True

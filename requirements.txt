@@ -1,0 +1,10 @@
+pandas
+matplotlib
+numpy==1.24.3
+statsmodels
+prophet
+tensorflow==2.13.1
+keras==2.13.1
+ccxt
+pandas_ta
+scikit-learn

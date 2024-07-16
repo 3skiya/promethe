@@ -1,0 +1,5 @@
+venv/
+*.log
+*.so
+api.txt
+config.json

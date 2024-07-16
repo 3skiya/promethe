@@ -1,0 +1,9 @@
+[DEFAULT]
+symbol=BTCUSDT
+timeframe=1h
+start_date=2023-01-01T00:00:00Z
+end_date=2024-01-01T00:00:00Z
+forecast_steps=10
+use_model_1=false
+use_model_2=true
+balance=1000
