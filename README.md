@@ -29,3 +29,60 @@ prometheus.py: Ana dosya. Diğer dosyalardaki fonksiyonları çağırarak veriyi
 
 Yapılandırma
 API anahtarlarınızı api.txt dosyasına, ticaret değerlerini TradeValues.txt dosyasına ve model değerlerini ModelValues.txt dosyasına kaydedin.
+
+
+
+### Model ve Stratejiler
+
+**Mevcut Modeller:**
+1. **Model-1: ARIMA**
+   - Zaman serisi tahmin modeli
+   - Özellikle kısa vadeli tahminlerde etkilidir
+
+2. **Model-2: LSTM**
+   - Derin öğrenme modeli
+   - Uzun vadeli bağımlılıkları öğrenebilir
+
+**Ek Modeller ve Stratejiler:**
+
+**iPython Notebook'lar:**
+1. **Baseline.ipynb**
+2. **BoxPlot.ipynb**
+3. **DataCollection.ipynb**
+4. **DataProcessor.ipynb**
+5. **GAN.ipynb**
+6. **LinearRegression.ipynb**
+7. **PastSampler.ipynb**
+8. **PlotRegularization.ipynb**
+9. **PlotTest.ipynb**
+10. **Plot_CNN.ipynb**
+11. **Plot_GRU.ipynb**
+12. **Plot_LSTM.ipynb**
+
+**Python Dosyaları:**
+1. **CNN.py**
+   - Convolutional Neural Network modeli
+
+2. **GRU.py**
+   - Gated Recurrent Unit modeli
+
+3. **GRU_WF.py**
+   - Gated Recurrent Unit with Wavelet Transform modeli
+
+4. **LSTM.py**
+   - LSTM modeli
+
+5. **Prediction.py**
+   - Tahmin fonksiyonları
+
+**Bu modelleri projeye entegre edebilir ve stratejileri genişletebiliriz.**
+
+### Mevcut Tahminler ve Tarihler
+**Tahminlerin Tarihleri:**
+- Mevcut tahminler 31.12.2023 15:00 - 01.01.2024 00:00 arası
+
+**Nedenleri:**
+- `forecast_steps` 10 olarak ayarlanmış, bu nedenle model 10 saatlik tahminler yapar.
+- Mevcut tahminler, `start_date` ve `end_date` aralığına dayalı olarak yapılmıştır. 
+
+Bu tarihleri güncelleyerek ve `forecast_steps` değerini değiştirerek daha güncel tahminler elde edebilirsiniz.
