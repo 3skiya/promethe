@@ -33,15 +33,9 @@ client = initialize_binance(api_key, api_secret)
 print(f"Using symbol: {symbol}")
 data = fetch_data(client, symbol, timeframe, start_date, end_date)
 
-# Check the structure of fetched data
-print(f"Fetched data: {data[:5]}")
-
 # Ensure the 'timestamp' column exists
 columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore']
 df = pd.DataFrame(data, columns=columns)
-
-# Ensure all columns are present
-print(f"Data columns: {df.columns}")
 
 # Convert 'timestamp' to datetime and set as index
 df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
@@ -57,15 +51,15 @@ if use_model_1:
     forecasts = perform_forecasts_model_1(df, forecast_steps)
     print(f"Model-1 Forecasts: {forecasts}")
 elif use_model_2:
-    from new_models.model import perform_forecasts_model_2
+    from forecasting.perform_forecasts import perform_forecasts_model_2
     forecasts = perform_forecasts_model_2(df, forecast_steps)
     print(f"Model-2 Forecasts: {forecasts}")
 elif use_model_3:
-    from new_models.cnn_model import perform_forecasts_model_3
+    from forecasting.perform_forecasts import perform_forecasts_model_3
     forecasts = perform_forecasts_model_3(df, forecast_steps)
     print(f"Model-3 Forecasts: {forecasts}")
 elif use_model_4:
-    from new_models.gru_model import perform_forecasts_model_4
+    from forecasting.perform_forecasts import perform_forecasts_model_4
     forecasts = perform_forecasts_model_4(df, forecast_steps)
     print(f"Model-4 Forecasts: {forecasts}")
 else:
@@ -91,4 +85,4 @@ print("\nBacktest Summary:")
 print(f"Initial Balance: {backtest_results['initial_balance']}")
 print(f"Profit: {backtest_results['profit']}")
 print(f"Number of Trades: {backtest_results['trades']}")
-#v.1.9
+#v.1.10
