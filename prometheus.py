@@ -22,6 +22,7 @@ use_model_1 = trade_values.getboolean('use_model_1', fallback=False)
 use_model_2 = trade_values.getboolean('use_model_2', fallback=False)
 use_model_3 = trade_values.getboolean('use_model_3', fallback=False)
 use_model_4 = trade_values.getboolean('use_model_4', fallback=False)
+use_model_5 = trade_values.getboolean('use_model_5', fallback=False)
 initial_balance = float(trade_values['balance'])
 
 # Binance API keys
@@ -62,6 +63,10 @@ elif use_model_4:
     from forecasting.perform_forecasts import perform_forecasts_model_4
     forecasts = perform_forecasts_model_4(df, forecast_steps)
     print(f"Model-4 Forecasts: {forecasts}")
+elif use_model_5:
+    from forecasting.perform_forecasts import perform_forecasts_model_5
+    forecasts = perform_forecasts_model_5(df, forecast_steps)
+    print(f"Model-5 Forecasts: {forecasts}")
 else:
     raise ValueError("No model selected in configuration.")
 
@@ -89,18 +94,4 @@ forecast_df['Difference'] = forecast_df['Actual'] - forecast_df['Forecast']
 forecast_df['Percentage Difference (%)'] = (forecast_df['Difference'] / forecast_df['Actual']) * 100
 
 # Apply trading strategy
-df = dynamic_trading_strategy(df, forecasts)
-
-# Perform backtest
-backtest_results = backtest(df, forecasts, initial_balance)
-print(backtest_results)
-
-# Summary of forecasts and backtest results
-print("\nForecast Summary:")
-for i, row in forecast_df.iterrows():
-    print(f"Date: {row['Date']}, Forecast: {int(row['Forecast']):,}, Actual: {int(row['Actual']):,}, Difference: {int(row['Difference']):,}, Percentage Difference (%): {row['Percentage Difference (%)']:.2f}%")
-
-print("\nBacktest Summary:")
-print(f"Initial Balance: {int(backtest_results['initial_balance']):,}")
-print(f"Profit: {int(backtest_results['profit']):,}")
-print(f"Number of Trades: {backtest_results['trades']}")
+df = dynamic_trading_strategy(df
