@@ -94,4 +94,18 @@ forecast_df['Difference'] = forecast_df['Actual'] - forecast_df['Forecast']
 forecast_df['Percentage Difference (%)'] = (forecast_df['Difference'] / forecast_df['Actual']) * 100
 
 # Apply trading strategy
-df = dynamic_trading_strategy(df
+df = dynamic_trading_strategy(df, forecasts)
+
+# Perform backtest
+backtest_results = backtest(df, forecasts, initial_balance)
+print(backtest_results)
+
+# Summary of forecasts and backtest results
+print("\nForecast Summary:")
+for i, row in forecast_df.iterrows():
+    print(f"Date: {row['Date']}, Forecast: {int(row['Forecast']):,}, Actual: {int(row['Actual']):,}, Difference: {int(row['Difference']):,}, Percentage Difference (%): {row['Percentage Difference (%)']:.2f}%")
+
+print("\nBacktest Summary:")
+print(f"Initial Balance: {int(backtest_results['initial_balance']):,}")
+print(f"Profit: {int(backtest_results['profit']):,}")
+print(f"Number of Trades: {backtest_results['trades']}")
