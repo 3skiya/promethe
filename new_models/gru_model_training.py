@@ -1,7 +1,15 @@
-import subprocess
+import configparser
+import pandas as pd
+import numpy as np
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import GRU, Dense
+from sklearn.preprocessing import MinMaxScaler
+import os
+import sys
 
-try:
-    result = subprocess.run(['python3', 'new_models/gru_model_training.py'], check=True, capture_output=True, text=True)
-    print('gru_model_training.py: success')
-except subprocess.CalledProcessError as e:
-    print(f'gru_model_training.py: fail ({e})')
+# `data_fetching` modülünü import edebilmek için sys.path'e dizin ekleme
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'data_fetching'))
+from data_fetching import fetch_data, load_api_keys, initialize_binance
+
+# Load configuration
+config_path = os.path.join(os.path.dirname(__file__), '..', 'Trade
