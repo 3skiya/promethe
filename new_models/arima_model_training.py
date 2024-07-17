@@ -1,11 +1,15 @@
 import configparser
 import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
-from data_fetching.data_fetching import fetch_data, load_api_keys, initialize_binance
 import os
+import sys
+
+# `data_fetching` modülünü import edebilmek için sys.path'e dizin ekleme
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'data_fetching'))
+from data_fetching import fetch_data, load_api_keys, initialize_binance
 
 # Load configuration
-config_path = 'TradeValues.txt'
+config_path = os.path.join(os.path.dirname(__file__), '..', 'TradeValues.txt')
 config = configparser.ConfigParser()
 config.read(config_path)
 
@@ -17,23 +21,33 @@ start_date = trade_values['start_date']
 end_date = trade_values['end_date']
 
 # Binance API keys
-api_key_path = 'api.txt'
+api_key_path = os.path.join(os.path.dirname(__file__), '..', 'api.txt')
 api_key, api_secret = load_api_keys(api_key_path)
 client = initialize_binance(api_key, api_secret)
 
 # Fetch data
 data = fetch_data(client, symbol, timeframe, start_date, end_date)
-df = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+df = pd.DataFrame(data, columns=[
+    'timestamp', 'open', 'high', 'low', 'close', 'volume',
+    'close_time', 'quote_asset_volume', 'number_of_trades',
+    'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
+])
 df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
 df.set_index('timestamp', inplace=True)
 
+# Verileri sayısal türe dönüştürme
+df['close'] = pd.to_numeric(df['close'])
+
 # ARIMA model training
+print("Starting ARIMA model training...")
 model = ARIMA(df['close'], order=(5, 1, 0))
 model_fit = model.fit()
+print(model_fit.summary())
 
 # Create directory if not exists
-os.makedirs('new_models/models', exist_ok=True)
+output_dir = os.path.join(os.path.dirname(__file__), 'models')
+os.makedirs(output_dir, exist_ok=True)
 
 # Save the model
-model_fit.save('new_models/models/arima_model.pkl')
+model_fit.save(os.path.join(output_dir, 'arima_model.pkl'))
 print("ARIMA model training complete.")

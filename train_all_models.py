@@ -17,6 +17,6 @@ for file in training_files:
         result = subprocess.run(['python3', file], check=True, capture_output=True, text=True)
         print(f'{file}: success')
     except subprocess.CalledProcessError as e:
-        print(f'{file}: fail ({e})')
+        print(f'{file}: fail ({e.stderr})')
 
 print("Eğitim dosyaları çalıştırıldı.")
