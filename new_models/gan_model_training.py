@@ -87,8 +87,11 @@ for epoch in range(epochs):
     
     if epoch % 1000 == 0:
         print(f"{epoch} [D loss: {d_loss[0]}, acc.: {100*d_loss[1]}%] [G loss: {g_loss}]")
+        # Modelleri kontrol noktalarında kaydet
+        generator.save(f'new_models/gan_generator_epoch_{epoch}.h5')
+        discriminator.save(f'new_models/gan_discriminator_epoch_{epoch}.h5')
 
-# Modeli kaydetme
+# Nihai modelleri kaydetme
 os.makedirs('new_models', exist_ok=True)
 generator.save('new_models/gan_generator.h5')
 discriminator.save('new_models/gan_discriminator.h5')
