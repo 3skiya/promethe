@@ -1,49 +1,52 @@
+import configparser
 from binance.client import Client
 import pandas as pd
-import configparser
 
-def load_api_keys(file_path):
+def load_api_keys(filepath):
     config = configparser.ConfigParser()
-    config.read(file_path)
-    api_key = config['DEFAULT']['api_key']
-    api_secret = config['DEFAULT']['api_secret']
-    return api_key, api_secret
+    config.read(filepath)
+    return config['DEFAULT']['api_key'], config['DEFAULT']['api_secret']
+
+def initialize_binance(api_key, api_secret):
+    return Client(api_key, api_secret)
 
 def fetch_data(client, symbol, timeframe, start_date, end_date):
     klines = client.get_historical_klines(symbol, timeframe, start_date, end_date)
     data = []
     for kline in klines:
         data.append([
-            kline[0], # timestamp
-            kline[1], # open
-            kline[2], # high
-            kline[3], # low
-            kline[4], # close
-            kline[5], # volume
-            kline[6], # close time
-            kline[7], # quote asset volume
-            kline[8], # number of trades
-            kline[9], # taker buy base asset volume
-            kline[10], # taker buy quote asset volume
-            kline[11] # ignore
+            kline[0],  # timestamp
+            kline[1],  # open
+            kline[2],  # high
+            kline[3],  # low
+            kline[4],  # close
+            kline[5],  # volume
+            kline[6],  # close_time
+            kline[7],  # quote_asset_volume
+            kline[8],  # number_of_trades
+            kline[9],  # taker_buy_base_asset_volume
+            kline[10], # taker_buy_quote_asset_volume
+            kline[11]  # ignore
         ])
-    return data
-
-def load_trade_values(trade_values_path):
-    config = configparser.ConfigParser()
-    config.read(trade_values_path)
-    trade_values = {
-        'symbol': config['DEFAULT']['symbol'],
-        'timeframe': config['DEFAULT']['timeframe'],
-        'start_date': config['DEFAULT']['start_date'],
-        'end_date': config['DEFAULT']['end_date'],
-        'forecast_steps': config['DEFAULT']['forecast_steps'],
-        'use_model_1': config['DEFAULT']['use_model_1'],
-        'use_model_2': config['DEFAULT']['use_model_2'],
-        'balance': config['DEFAULT']['balance']
-    }
-    return trade_values
-
-def initialize_binance(api_key, api_secret):
-    client = Client(api_key, api_secret)
-    return client
+    df = pd.DataFrame(data, columns=[
+        'timestamp', 'open', 'high', 'low', 'close', 'volume',
+        'close_time', 'quote_asset_volume', 'number_of_trades',
+        'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
+    ])
+    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+    df.set_index('timestamp', inplace=True)
+    
+    # Hareketli Ortalama (Moving Average) ekleme
+    df['SMA_20'] = df['close'].rolling(window=20).mean()
+    df['SMA_50'] = df['close'].rolling(window=50).mean()
+    
+    # RSI (Relative Strength Index) ekleme
+    delta = df['close'].diff(1)
+    gain = delta.where(delta > 0, 0)
+    loss = -delta.where(delta < 0, 0)
+    avg_gain = gain.rolling(window=14).mean()
+    avg_loss = loss.rolling(window=14).mean()
+    rs = avg_gain / avg_loss
+    df['RSI'] = 100 - (100 / (1 + rs))
+    
+    return df
