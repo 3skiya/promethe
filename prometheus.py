@@ -119,6 +119,8 @@ for model_name, model_forecasts in forecasts.items():
 print("\nForecast Summary:")
 for i, row in forecast_df.iterrows():
     summary = f"Date: {row['Date']}, Actual: ${int(row['Actual']):,}"
+    best_model = None
+    best_diff = float('inf')
     for model_name in forecasts.keys():
         forecast_value = row[model_name]
         if pd.isna(forecast_value):
@@ -127,4 +129,9 @@ for i, row in forecast_df.iterrows():
             difference = row['Actual'] - forecast_value
             percentage_difference = (difference / row['Actual']) * 100
             summary += f", {model_name} Forecast: ${int(forecast_value):,}, Diff: {int(difference):,}, (%): {percentage_difference:.2f}%"
+            if abs(difference) < best_diff:
+                best_diff = abs(difference)
+                best_model = model_name
     print(summary)
+    if best_model:
+        print(f"\033[1m\033[94mBest Model for {row['Date']}: {best_model} with Diff: {best_diff:.2f}\033[0m")
