@@ -80,7 +80,8 @@ elif use_gan:
     forecasts = perform_forecasts_model_7(df, forecast_steps)
     print(f"GAN Forecasts: {forecasts}")
 elif use_prediction:
-    forecasts = predict(df, 'linear_regression')['Prediction'].values[-forecast_steps:]
+    predictions = predict(df, 'linear_regression')
+    forecasts = predictions['Prediction'].values[-forecast_steps:]
     print(f"Prediction Forecasts: {forecasts}")
 else:
     raise ValueError("No model selected in configuration.")

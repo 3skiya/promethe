@@ -2,13 +2,15 @@ import pandas as pd
 import numpy as np
 
 def moving_average(data, window_size):
-    return data['Close'].rolling(window=window_size).mean()
+    data['Prediction'] = data['close'].rolling(window=window_size).mean()
+    return data
 
 def exponential_smoothing(data, alpha):
-    return data['Close'].ewm(alpha=alpha).mean()
+    data['Prediction'] = data['close'].ewm(alpha=alpha).mean()
+    return data
 
 def linear_regression(data):
-    data['Prediction'] = data[['Close']].shift(-1)
+    data['Prediction'] = data[['close']].shift(-1)
     return data
 
 def predict(data, model, **kwargs):
@@ -26,7 +28,7 @@ def predict(data, model, **kwargs):
 def main():
     # Örnek veri
     data = pd.DataFrame({
-        'Close': [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+        'close': [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     })
 
     # Hareketli Ortalama
