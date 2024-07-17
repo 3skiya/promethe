@@ -51,43 +51,39 @@ df = df[['open', 'high', 'low', 'close', 'volume']]
 df[['open', 'high', 'low', 'close', 'volume']] = df[['open', 'high', 'low', 'close', 'volume']].apply(pd.to_numeric)
 
 # Perform forecasts
+forecasts = {}
 if use_arima:
     from forecasting.perform_forecasts import perform_forecasts_model_1
-    forecasts = perform_forecasts_model_1(df, forecast_steps)
-    print(f"ARIMA Forecasts: {forecasts}")
-elif use_lstm:
+    forecasts['ARIMA'] = perform_forecasts_model_1(df, forecast_steps)
+    print(f"ARIMA Forecasts: {forecasts['ARIMA']}")
+if use_lstm:
     from forecasting.perform_forecasts import perform_forecasts_model_2
-    forecasts = perform_forecasts_model_2(df, forecast_steps)
-    print(f"LSTM Forecasts: {forecasts}")
-elif use_cnn:
+    forecasts['LSTM'] = perform_forecasts_model_2(df, forecast_steps)
+    print(f"LSTM Forecasts: {forecasts['LSTM']}")
+if use_cnn:
     from forecasting.perform_forecasts import perform_forecasts_model_3
-    forecasts = perform_forecasts_model_3(df, forecast_steps)
-    print(f"CNN Forecasts: {forecasts}")
-elif use_gru:
+    forecasts['CNN'] = perform_forecasts_model_3(df, forecast_steps)
+    print(f"CNN Forecasts: {forecasts['CNN']}")
+if use_gru:
     from forecasting.perform_forecasts import perform_forecasts_model_4
-    forecasts = perform_forecasts_model_4(df, forecast_steps)
-    print(f"GRU Forecasts: {forecasts}")
-elif use_gru_wf:
+    forecasts['GRU'] = perform_forecasts_model_4(df, forecast_steps)
+    print(f"GRU Forecasts: {forecasts['GRU']}")
+if use_gru_wf:
     from forecasting.perform_forecasts import perform_forecasts_model_5
-    forecasts = perform_forecasts_model_5(df, forecast_steps)
-    print(f"GRU_WF Forecasts: {forecasts}")
-elif use_linear_regression:
+    forecasts['GRU_WF'] = perform_forecasts_model_5(df, forecast_steps)
+    print(f"GRU_WF Forecasts: {forecasts['GRU_WF']}")
+if use_linear_regression:
     from forecasting.perform_forecasts import perform_forecasts_model_6
-    forecasts = perform_forecasts_model_6(df, forecast_steps)
-    print(f"Linear Regression Forecasts: {forecasts}")
-elif use_gan:
+    forecasts['Linear Regression'] = perform_forecasts_model_6(df, forecast_steps)
+    print(f"Linear Regression Forecasts: {forecasts['Linear Regression']}")
+if use_gan:
     from forecasting.perform_forecasts import perform_forecasts_model_7
-    forecasts = perform_forecasts_model_7(df, forecast_steps)
-    print(f"GAN Forecasts: {forecasts}")
-elif use_prediction:
+    forecasts['GAN'] = perform_forecasts_model_7(df, forecast_steps)
+    print(f"GAN Forecasts: {forecasts['GAN']}")
+if use_prediction:
     predictions = predict(df, 'linear_regression')
-    forecasts = predictions['Prediction'].values[-forecast_steps:]
-    print(f"Prediction Forecasts: {forecasts}")
-else:
-    raise ValueError("No model selected in configuration.")
-
-if forecasts is None:
-    raise ValueError("Tahminler NoneType, lütfen tahmin fonksiyonlarını kontrol edin.")
+    forecasts['Prediction'] = predictions['Prediction'].values[-forecast_steps:]
+    print(f"Prediction Forecasts: {forecasts['Prediction']}")
 
 # Gerçek fiyatları Binance API'den çekme
 forecast_dates = pd.date_range(start=df.index[-forecast_steps], periods=forecast_steps, freq='H')
@@ -101,30 +97,34 @@ for date in forecast_dates:
 # Tahmin ve gerçekleşen fiyatları karşılaştırma
 forecast_df = pd.DataFrame({
     'Date': forecast_dates,
-    'Forecast': forecasts,
     'Actual': actual_prices
 })
 
-# Fark ve yüzde fark hesaplama
-forecast_df['Difference'] = forecast_df['Actual'] - forecast_df['Forecast']
-forecast_df['Percentage Difference (%)'] = (forecast_df['Difference'] / forecast_df['Actual']) * 100
+for model_name, model_forecasts in forecasts.items():
+    forecast_df[model_name] = model_forecasts
 
 # Apply trading strategy
-df = dynamic_trading_strategy(df, forecasts)
+for model_name, model_forecasts in forecasts.items():
+    df = dynamic_trading_strategy(df, model_forecasts)
 
 # Perform backtest
-backtest_results = backtest(df, forecasts, initial_balance)
-print(backtest_results)
+for model_name, model_forecasts in forecasts.items():
+    backtest_results = backtest(df, model_forecasts, initial_balance)
+    print(f"\nBacktest Summary for {model_name}:")
+    print(f"Initial Balance: {int(backtest_results['initial_balance']):,}")
+    print(f"Profit: {int(backtest_results['profit']):,}")
+    print(f"Number of Trades: {backtest_results['trades']}")
 
 # Summary of forecasts and backtest results
 print("\nForecast Summary:")
 for i, row in forecast_df.iterrows():
-    try:
-        print(f"Date: {row['Date']}, Forecast: {int(row['Forecast']):,}, Actual: {int(row['Actual']):,}, Difference: {int(row['Difference']):,}, Percentage Difference (%): {row['Percentage Difference (%)']:.2f}%")
-    except ValueError:
-        print(f"Date: {row['Date']}, Forecast: NaN, Actual: {int(row['Actual']):,}, Difference: NaN, Percentage Difference (%): NaN%")
-
-print("\nBacktest Summary:")
-print(f"Initial Balance: {int(backtest_results['initial_balance']):,}")
-print(f"Profit: {int(backtest_results['profit']):,}")
-print(f"Number of Trades: {backtest_results['trades']}")
+    summary = f"Date: {row['Date']}, Actual: ${int(row['Actual']):,}"
+    for model_name in forecasts.keys():
+        forecast_value = row[model_name]
+        if pd.isna(forecast_value):
+            summary += f", {model_name} Forecast: NaN, Diff: NaN, (%): NaN%"
+        else:
+            difference = row['Actual'] - forecast_value
+            percentage_difference = (difference / row['Actual']) * 100
+            summary += f", {model_name} Forecast: ${int(forecast_value):,}, Diff: {int(difference):,}, (%): {percentage_difference:.2f}%"
+    print(summary)
