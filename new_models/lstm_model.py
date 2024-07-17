@@ -5,6 +5,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from sklearn.preprocessing import MinMaxScaler
 from data_fetching.data_fetching import fetch_data, load_api_keys, initialize_binance
+import os
 
 # Load configuration
 config_path = 'TradeValues.txt'
@@ -50,6 +51,9 @@ model.add(Dense(units=1))
 model.compile(optimizer='adam', loss='mean_squared_error')
 model.fit(x_train, y_train, epochs=25, batch_size=32)
 
+# Create directory if not exists
+os.makedirs('new_models/models', exist_ok=True)
+
 # Save the model
-model.save('new_models/lstm_model.h5')
+model.save('new_models/models/lstm_model.h5')
 print("LSTM model training complete.")

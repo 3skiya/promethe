@@ -2,6 +2,7 @@ import configparser
 import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 from data_fetching.data_fetching import fetch_data, load_api_keys, initialize_binance
+import os
 
 # Load configuration
 config_path = 'TradeValues.txt'
@@ -30,6 +31,9 @@ df.set_index('timestamp', inplace=True)
 model = ARIMA(df['close'], order=(5, 1, 0))
 model_fit = model.fit()
 
+# Create directory if not exists
+os.makedirs('new_models/models', exist_ok=True)
+
 # Save the model
-model_fit.save('new_models/arima_model.pkl')
+model_fit.save('new_models/models/arima_model.pkl')
 print("ARIMA model training complete.")
