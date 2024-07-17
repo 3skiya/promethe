@@ -119,7 +119,10 @@ print(backtest_results)
 # Summary of forecasts and backtest results
 print("\nForecast Summary:")
 for i, row in forecast_df.iterrows():
-    print(f"Date: {row['Date']}, Forecast: {int(row['Forecast']):,}, Actual: {int(row['Actual']):,}, Difference: {int(row['Difference']):,}, Percentage Difference (%): {row['Percentage Difference (%)']:.2f}%")
+    try:
+        print(f"Date: {row['Date']}, Forecast: {int(row['Forecast']):,}, Actual: {int(row['Actual']):,}, Difference: {int(row['Difference']):,}, Percentage Difference (%): {row['Percentage Difference (%)']:.2f}%")
+    except ValueError:
+        print(f"Date: {row['Date']}, Forecast: NaN, Actual: {int(row['Actual']):,}, Difference: NaN, Percentage Difference (%): NaN%")
 
 print("\nBacktest Summary:")
 print(f"Initial Balance: {int(backtest_results['initial_balance']):,}")
