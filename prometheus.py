@@ -5,6 +5,7 @@ from binance.client import Client
 from data_fetching.data_fetching import fetch_data, load_api_keys, load_trade_values, initialize_binance
 from trading_strategies.dynamic_trading_strategy import dynamic_trading_strategy
 from performance import calculate_mape, print_mape, backtest
+from Prediction import predict
 
 # Load configuration
 config_path = 'TradeValues.txt'
@@ -18,13 +19,14 @@ timeframe = trade_values['timeframe']
 start_date = trade_values['start_date']
 end_date = trade_values['end_date']
 forecast_steps = int(trade_values['forecast_steps'])
-use_model_1 = trade_values.getboolean('use_model_1', fallback=False)
-use_model_2 = trade_values.getboolean('use_model_2', fallback=False)
-use_model_3 = trade_values.getboolean('use_model_3', fallback=False)
-use_model_4 = trade_values.getboolean('use_model_4', fallback=False)
-use_model_5 = trade_values.getboolean('use_model_5', fallback=False)
-use_model_6 = trade_values.getboolean('use_model_6', fallback=False)
-use_model_7 = trade_values.getboolean('use_model_7', fallback=False)
+use_arima = trade_values.getboolean('use_arima', fallback=False)
+use_lstm = trade_values.getboolean('use_lstm', fallback=False)
+use_cnn = trade_values.getboolean('use_cnn', fallback=False)
+use_gru = trade_values.getboolean('use_gru', fallback=False)
+use_gru_wf = trade_values.getboolean('use_gru_wf', fallback=False)
+use_linear_regression = trade_values.getboolean('use_linear_regression', fallback=False)
+use_gan = trade_values.getboolean('use_gan', fallback=False)
+use_prediction = trade_values.getboolean('use_prediction', fallback=False)
 initial_balance = float(trade_values['balance'])
 
 # Binance API keys
@@ -49,34 +51,37 @@ df = df[['open', 'high', 'low', 'close', 'volume']]
 df[['open', 'high', 'low', 'close', 'volume']] = df[['open', 'high', 'low', 'close', 'volume']].apply(pd.to_numeric)
 
 # Perform forecasts
-if use_model_1:
+if use_arima:
     from forecasting.perform_forecasts import perform_forecasts_model_1
     forecasts = perform_forecasts_model_1(df, forecast_steps)
-    print(f"Model-1 Forecasts: {forecasts}")
-elif use_model_2:
+    print(f"ARIMA Forecasts: {forecasts}")
+elif use_lstm:
     from forecasting.perform_forecasts import perform_forecasts_model_2
     forecasts = perform_forecasts_model_2(df, forecast_steps)
-    print(f"Model-2 Forecasts: {forecasts}")
-elif use_model_3:
+    print(f"LSTM Forecasts: {forecasts}")
+elif use_cnn:
     from forecasting.perform_forecasts import perform_forecasts_model_3
     forecasts = perform_forecasts_model_3(df, forecast_steps)
-    print(f"Model-3 Forecasts: {forecasts}")
-elif use_model_4:
+    print(f"CNN Forecasts: {forecasts}")
+elif use_gru:
     from forecasting.perform_forecasts import perform_forecasts_model_4
     forecasts = perform_forecasts_model_4(df, forecast_steps)
-    print(f"Model-4 Forecasts: {forecasts}")
-elif use_model_5:
+    print(f"GRU Forecasts: {forecasts}")
+elif use_gru_wf:
     from forecasting.perform_forecasts import perform_forecasts_model_5
     forecasts = perform_forecasts_model_5(df, forecast_steps)
-    print(f"Model-5 Forecasts: {forecasts}")
-elif use_model_6:
+    print(f"GRU_WF Forecasts: {forecasts}")
+elif use_linear_regression:
     from forecasting.perform_forecasts import perform_forecasts_model_6
     forecasts = perform_forecasts_model_6(df, forecast_steps)
-    print(f"Model-6 Forecasts: {forecasts}")
-elif use_model_7:
+    print(f"Linear Regression Forecasts: {forecasts}")
+elif use_gan:
     from forecasting.perform_forecasts import perform_forecasts_model_7
     forecasts = perform_forecasts_model_7(df, forecast_steps)
-    print(f"Model-7 Forecasts: {forecasts}")
+    print(f"GAN Forecasts: {forecasts}")
+elif use_prediction:
+    forecasts = predict(df, 'linear_regression')['Prediction'].values[-forecast_steps:]
+    print(f"Prediction Forecasts: {forecasts}")
 else:
     raise ValueError("No model selected in configuration.")
 
