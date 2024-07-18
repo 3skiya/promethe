@@ -29,16 +29,9 @@ api_key, api_secret = load_api_keys(api_key_path)
 client = initialize_binance(api_key, api_secret)
 
 # Fetch data
-data = fetch_data(client, symbol, timeframe, start_date, end_date)
-df = pd.DataFrame(data, columns=[
-    'timestamp', 'open', 'high', 'low', 'close', 'volume',
-    'close_time', 'quote_asset_volume', 'number_of_trades',
-    'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore'
-])
+df = fetch_data(client, symbol, timeframe, start_date, end_date)
 df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
 df.set_index('timestamp', inplace=True)
-
-# Verileri sayısal türe dönüştürme
 df['close'] = pd.to_numeric(df['close'])
 
 # Preprocess data
@@ -61,7 +54,7 @@ model.add(LSTM(units=50, return_sequences=True, input_shape=(x_train.shape[1], 1
 model.add(LSTM(units=50))
 model.add(Dense(units=1))
 model.compile(optimizer='adam', loss='mean_squared_error')
-history = model.fit(x_train, y_train, epochs=25, batch_size=32, verbose=1)
+history = model.fit(x_train, y_train, epochs=25, batch_size=16, verbose=1)  # Batch size'ı 16 olarak değiştirdim
 
 # Training history
 print("LSTM model training history:")
